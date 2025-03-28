@@ -304,16 +304,6 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     if (_cameraController == null || _cameraController?.value.isInitialized == false) {
       return const Center(child: CircularProgressIndicator.adaptive());
     }
-
-    final size = MediaQuery.of(context).size;
-    var scale = size.aspectRatio * _cameraController!.value.aspectRatio;
-    if (scale < 1) scale = 1 / scale;
-    int rotationAngle = 0;
-    if (_cameraController != null) {
-      if (Platform.isAndroid) {
-        rotationAngle = _cameraController?.description.sensorOrientation ?? 0;
-      }
-    }
     return Stack(
       children: [
         Container(
@@ -325,11 +315,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
           locale: widget.locale,
           isDarkMode: widget.isDarkMode,
           isFaceDetected: _faceDetectedState,
-          camera: Transform.rotate(
-            angle: rotationAngle * (3.141592653589793 / 180), // Konversi derajat ke radian
-            child: CameraPreview(_cameraController!),
-          ),
-          // camera: CameraPreview(_cameraController!),
+          camera: CameraPreview(_cameraController!),
           key: _stepsKey,
           steps: stepLiveness,
           showCurrentStep: widget.showCurrentStep,
