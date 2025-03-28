@@ -59,30 +59,22 @@ class _HomeViewState extends State<HomeView> {
           ElevatedButton.icon(
               icon: const Icon(Icons.camera_alt_rounded),
               onPressed: () async {
-<<<<<<< HEAD
                 final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance.livenessDetection(
-                  showCurrentStep: true,
-=======
-                final String? response =
-                    await FlutterLivenessDetectionRandomizedPlugin.instance
-                        .livenessDetection(
->>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
                   context: context,
                   config: LivenessDetectionConfig(
-                    durationLivenessVerify:
-                        60, // default duration value is 45 second
+                    durationLivenessVerify: 60, // default duration value is 45 second
                     showDurationUiText: true,
                     startWithInfoScreen: true,
                     useCustomizedLabel: true,
                     // provide an empty string if you want to pass the liveness challenge
-                    customizedLabel: LivenessDetectionLabelModel(
-                      blink: 'Berkedip',
-                      lookDown: 'Tengok bawah',
-                      lookLeft: 'Tengok kiri',
-                      lookRight: 'Tengok kanan',
-                      lookUp: 'Tengok atas',
-                      smile: 'Senyum',
-                    ),
+                    // customizedLabel: LivenessDetectionLabelModel(
+                    //   blink: 'Berkedip',
+                    //   lookDown: 'Tengok bawah',
+                    //   lookLeft: 'Tengok kiri',
+                    //   lookRight: 'Tengok kanan',
+                    //   lookUp: 'Tengok atas',
+                    //   smile: 'Senyum',
+                    // ),
                   ),
                   isEnableSnackBar: true,
                   shuffleListWithSmileLast: true,
