@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/material.dart'; // Tambahkan import yang hilang
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_liveness_detection_randomized_plugin/index.dart';
 import 'package:flutter_liveness_detection_randomized_plugin/src/presentation/widgets/circular_progress_widget/circular_progress_widget.dart';
@@ -13,16 +15,17 @@ class LivenessDetectionStepOverlayWidget extends StatefulWidget {
   final bool showDurationUiText;
   final int? duration;
 
-  const LivenessDetectionStepOverlayWidget(
-      {super.key,
-      required this.steps,
-      required this.onCompleted,
-      required this.camera,
-      required this.isFaceDetected,
-      this.showCurrentStep = false,
-      this.isDarkMode = true,
-      this.showDurationUiText = false,
-      this.duration});
+  const LivenessDetectionStepOverlayWidget({
+    super.key,
+    required this.steps,
+    required this.onCompleted,
+    required this.camera,
+    required this.isFaceDetected,
+    this.showCurrentStep = false,
+    this.isDarkMode = true,
+    this.showDurationUiText = false,
+    this.duration,
+  });
 
   @override
   State<LivenessDetectionStepOverlayWidget> createState() => LivenessDetectionStepOverlayWidgetState();
@@ -30,32 +33,29 @@ class LivenessDetectionStepOverlayWidget extends StatefulWidget {
 
 class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionStepOverlayWidget> {
   int get currentIndex => _currentIndex;
-  String locale = "en";
+
   bool _isLoading = false;
   int _currentIndex = 0;
   double _currentStepIndicator = 0;
   late final PageController _pageController;
   late CircularProgressWidget _circularProgressWidget;
-
-  // Add timer and remaining duration variables
   Timer? _countdownTimer;
   int _remainingDuration = 0;
+  bool _isMounted = false;
 
   static const double _indicatorMaxStep = 100;
   static const double _heightLine = 25;
 
-  double _getStepIncrement(int stepLength) {
-    return 100 / stepLength;
-  }
+  double _getStepIncrement(int stepLength) => stepLength > 0 ? 100 / stepLength : 0;
 
   String get stepCounter => "$_currentIndex/${widget.steps.length}";
 
   @override
   void initState() {
     super.initState();
+    _isMounted = true;
     _initializeControllers();
     _initializeTimer();
-    debugPrint('showCurrentStep ${widget.showCurrentStep}');
   }
 
   void _initializeControllers() {
@@ -71,13 +71,16 @@ class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionSte
   }
 
   void _startCountdownTimer() {
+    _countdownTimer?.cancel(); // Cancel any existing timer
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!_isMounted) {
+        timer.cancel();
+        return;
+      }
       if (_remainingDuration > 0) {
-        setState(() {
-          _remainingDuration--;
-        });
+        setState(() => _remainingDuration--);
       } else {
-        _countdownTimer?.cancel();
+        timer.cancel();
       }
     });
   }
@@ -95,41 +98,50 @@ class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionSte
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _isMounted = false;
     _countdownTimer?.cancel();
+    _pageController.dispose();
     super.dispose();
   }
 
   Future<void> nextPage() async {
-    if (_isLoading) return;
+    if (!_isMounted || _isLoading) return;
 
-    if (_currentIndex + 1 <= widget.steps.length - 1) {
-      await _handleNextStep();
-    } else {
-      await _handleCompletion();
+    try {
+      if (_currentIndex + 1 <= widget.steps.length - 1) {
+        await _handleNextStep();
+      } else {
+        await _handleCompletion();
+      }
+    } catch (e) {
+      debugPrint('Error in nextPage: $e');
     }
   }
 
   Future<void> _handleNextStep() async {
     _showLoader();
     await Future.delayed(const Duration(milliseconds: 100));
-    await _pageController.nextPage(
-      duration: const Duration(milliseconds: 1),
-      curve: Curves.easeIn,
-    );
-    await Future.delayed(const Duration(seconds: 1));
-    _hideLoader();
-    _updateState();
+    if (_isMounted) {
+      await _pageController.nextPage(
+        duration: const Duration(milliseconds: 1),
+        curve: Curves.easeIn,
+      );
+      await Future.delayed(const Duration(seconds: 1));
+      _hideLoader();
+      _updateState();
+    }
   }
 
   Future<void> _handleCompletion() async {
     _updateState();
     await Future.delayed(const Duration(milliseconds: 500));
-    widget.onCompleted();
+    if (_isMounted) {
+      widget.onCompleted();
+    }
   }
 
   void _updateState() {
-    if (mounted) {
+    if (_isMounted) {
       setState(() {
         _currentIndex++;
         _currentStepIndicator += _getStepIncrement(widget.steps.length);
@@ -139,26 +151,26 @@ class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionSte
   }
 
   void reset() {
+    if (!_isMounted) return;
     _pageController.jumpToPage(0);
-    if (mounted) {
-      setState(() {
-        _currentIndex = 0;
-        _currentStepIndicator = 0;
-        _circularProgressWidget = _buildCircularIndicator();
-      });
-    }
+    setState(() {
+      _currentIndex = 0;
+      _currentStepIndicator = 0;
+      _circularProgressWidget = _buildCircularIndicator();
+      if (widget.duration != null && widget.showDurationUiText) {
+        _remainingDuration = widget.duration!;
+        _startCountdownTimer();
+      }
+    });
   }
 
-  void _showLoader() {
-    if (mounted) setState(() => _isLoading = true);
-  }
-
-  void _hideLoader() {
-    if (mounted) setState(() => _isLoading = false);
-  }
+  void _showLoader() => _isMounted ? setState(() => _isLoading = true) : null;
+  void _hideLoader() => _isMounted ? setState(() => _isLoading = false) : null;
 
   @override
   Widget build(BuildContext context) {
+    if (!_isMounted) return const SizedBox.shrink();
+
     return SafeArea(
       minimum: const EdgeInsets.all(16),
       child: Container(
@@ -168,40 +180,7 @@ class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionSte
         color: Colors.transparent,
         child: Stack(
           children: [
-            GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: widget.showCurrentStep
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Back',
-                          style: TextStyle(
-                              color: widget.isDarkMode
-                                  ? Colors.white
-                                  : Colors.black),
-                        ),
-                        Visibility(
-                          replacement: const SizedBox.shrink(),
-                          visible: widget.showDurationUiText,
-                          child: Text(
-                            _getRemainingTimeText(_remainingDuration),
-                            style: TextStyle(
-                              color: widget.isDarkMode
-                                  ? Colors.white
-                                  : Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          stepCounter,
-                          style: TextStyle(color: widget.isDarkMode ? Colors.white : Colors.black),
-                        )
-                      ],
-                    )
-                  : Text(locale == "en" ? 'Back' : "Kembali", style: TextStyle(color: widget.isDarkMode ? Colors.white : Colors.black)),
-            ),
+            _buildHeader(),
             _buildBody(),
           ],
         ),
@@ -209,11 +188,39 @@ class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionSte
     );
   }
 
+  Widget _buildHeader() {
+    return GestureDetector(
+      onTap: () => _isMounted ? Navigator.maybePop(context) : null,
+      child: widget.showCurrentStep
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Back', style: TextStyle(color: widget.isDarkMode ? Colors.white : Colors.black)),
+                Visibility(
+                  visible: widget.showDurationUiText,
+                  replacement: const SizedBox.shrink(),
+                  child: Text(
+                    _getRemainingTimeText(_remainingDuration),
+                    style: TextStyle(
+                      color: widget.isDarkMode ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Text(stepCounter, style: TextStyle(color: widget.isDarkMode ? Colors.white : Colors.black)),
+              ],
+            )
+          : Text(
+              'Back',
+              style: TextStyle(color: widget.isDarkMode ? Colors.white : Colors.black),
+            ),
+    );
+  }
+
   Widget _buildBody() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
       children: [
         _buildCircularCamera(),
         const SizedBox(height: 16),
@@ -238,8 +245,8 @@ class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionSte
   }
 
   String _getRemainingTimeText(int duration) {
-    int minutes = duration ~/ 60;
-    int seconds = duration % 60;
+    final minutes = duration ~/ 60;
+    final seconds = duration % 60;
     return "${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
   }
 
@@ -257,24 +264,22 @@ class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionSte
                   width: widget.isFaceDetected ? 32 : 22,
                 )
               : ColorFiltered(
-                  colorFilter: ColorFilter.mode(widget.isFaceDetected ? Colors.green : Colors.black, BlendMode.modulate),
+                  colorFilter: ColorFilter.mode(
+                    widget.isFaceDetected ? Colors.green : Colors.black,
+                    BlendMode.modulate,
+                  ),
                   child: LottieBuilder.asset(
                     widget.isFaceDetected
                         ? 'packages/flutter_liveness_detection_randomized_plugin/src/core/assets/face-detected.json'
                         : 'packages/flutter_liveness_detection_randomized_plugin/src/core/assets/face-id-anim.json',
                     height: widget.isFaceDetected ? 32 : 22,
                     width: widget.isFaceDetected ? 32 : 22,
-                  )),
+                  ),
+                ),
         ),
         const SizedBox(width: 16),
         Text(
-          widget.isFaceDetected
-              ? locale == "en"
-                  ? 'User Face Found'
-                  : "Wajah Pengguna Ditemukan"
-              : locale == "en"
-                  ? 'User Face Not Found...'
-                  : "Wajah Pengguna Tidak Ditemukan...",
+          widget.isFaceDetected ? 'User Face Found' : 'User Face Not Found...',
           style: TextStyle(color: widget.isDarkMode ? Colors.white : Colors.black),
         ),
       ],
@@ -283,32 +288,18 @@ class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionSte
 
   Widget _buildStepPageView() {
     return SizedBox(
-      height: 150,
+      height: MediaQuery.of(context).size.height / 10,
       width: MediaQuery.of(context).size.width,
       child: AbsorbPointer(
         absorbing: true,
         child: PageView.builder(
           controller: _pageController,
           itemCount: widget.steps.length,
+          physics: const NeverScrollableScrollPhysics(),
           itemBuilder: _buildStepItem,
         ),
       ),
     );
-  }
-
-  String getLocalizedTitle(String locale, String title) {
-    if (locale == "en") return title;
-
-    Map<String, String> translations = {
-      "Blink 2-3 Times": "Kedip 2-3 Kali",
-      "Look UP": "Menghadap Ke Atas",
-      "Look DOWN": "Menghadap Ke Bawah",
-      "Look RIGHT": "Menghadap Ke Kanan",
-      "Look LEFT": "Menghadap Ke Kiri",
-      "Smile": "Tersenyum",
-    };
-
-    return translations[title] ?? title;
   }
 
   Widget _buildStepItem(BuildContext context, int index) {
@@ -323,7 +314,7 @@ class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionSte
         margin: const EdgeInsets.symmetric(horizontal: 30),
         padding: const EdgeInsets.all(10),
         child: Text(
-          getLocalizedTitle(locale, widget.steps[index].title),
+          widget.steps[index].title,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: widget.isDarkMode ? Colors.white : Colors.black,
@@ -338,7 +329,7 @@ class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionSte
   Widget _buildLoaderDarkMode() {
     return Center(
       child: CupertinoActivityIndicator(
-        color: !_isLoading ? Colors.transparent : Colors.white,
+        color: _isLoading ? Colors.white : Colors.transparent,
       ),
     );
   }
@@ -346,7 +337,7 @@ class LivenessDetectionStepOverlayWidgetState extends State<LivenessDetectionSte
   Widget _buildLoaderLightMode() {
     return Center(
       child: CupertinoActivityIndicator(
-        color: _isLoading ? Colors.transparent : Colors.white,
+        color: _isLoading ? Colors.black : Colors.transparent,
       ),
     );
   }
