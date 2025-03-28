@@ -37,10 +37,23 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   late final List<LivenessDetectionStepItem> steps;
   final GlobalKey<LivenessDetectionStepOverlayWidgetState> _stepsKey = GlobalKey<LivenessDetectionStepOverlayWidgetState>();
 
+<<<<<<< HEAD
   static void shuffleListLivenessChallenge({required List<LivenessDetectionStepItem> list, required bool isSmileLast, required String locale}) {
     if (isSmileLast == true) {
       int? blinkIndex = list.indexWhere((item) => item.title == "Blink 2-3 Times");
       int? smileIndex = list.indexWhere((item) => item.title == "Smile");
+=======
+  static void shuffleListLivenessChallenge({
+    required List<LivenessDetectionStepItem> list,
+    required bool isSmileLast,
+  }) {
+    if (isSmileLast) {
+      int? blinkIndex =
+          list.indexWhere((item) => item.step == LivenessDetectionStep.blink);
+      int? smileIndex =
+          list.indexWhere((item) => item.step == LivenessDetectionStep.smile);
+
+>>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
       if (blinkIndex != -1 && smileIndex != -1) {
         LivenessDetectionStepItem blinkItem = list.removeAt(blinkIndex);
         LivenessDetectionStepItem smileItem = list.removeAt(smileIndex > blinkIndex ? smileIndex - 1 : smileIndex);
@@ -55,12 +68,69 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     }
   }
 
+  List<LivenessDetectionStepItem> customizedLivenessLabel(
+      LivenessDetectionLabelModel label) {
+    List<LivenessDetectionStepItem> customizedSteps = [];
+    if (label.blink != "") {
+      customizedSteps.add(LivenessDetectionStepItem(
+        step: LivenessDetectionStep.blink,
+        title: label.blink ?? "Blink 2-3 Times",
+      ));
+    }
+
+    if (label.lookRight != "") {
+      customizedSteps.add(LivenessDetectionStepItem(
+        step: LivenessDetectionStep.lookRight,
+        title: label.lookRight ?? "Look Right",
+      ));
+    }
+
+    if (label.lookLeft != "") {
+      customizedSteps.add(LivenessDetectionStepItem(
+        step: LivenessDetectionStep.lookLeft,
+        title: label.lookLeft ?? "Look Left",
+      ));
+    }
+
+    if (label.lookUp != "") {
+      customizedSteps.add(LivenessDetectionStepItem(
+        step: LivenessDetectionStep.lookUp,
+        title: label.lookUp ?? "Look Up",
+      ));
+    }
+
+    if (label.lookDown != "") {
+      customizedSteps.add(LivenessDetectionStepItem(
+        step: LivenessDetectionStep.lookDown,
+        title: label.lookDown ?? "Look Down",
+      ));
+    }
+
+    if (label.smile != "") {
+      customizedSteps.add(LivenessDetectionStepItem(
+        step: LivenessDetectionStep.smile,
+        title: label.smile ?? "Smile",
+      ));
+    }
+
+    return customizedSteps;
+  }
+
   @override
   void initState() {
     _preInitCallBack();
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _postFrameCallBack());
+<<<<<<< HEAD
     shuffleListLivenessChallenge(list: stepLiveness, isSmileLast: widget.shuffleListWithSmileLast, locale: widget.locale);
+=======
+    shuffleListLivenessChallenge(
+        list: widget.config.useCustomizedLabel &&
+                widget.config.customizedLabel != null
+            ? customizedLivenessLabel(widget.config.customizedLabel!)
+            : stepLiveness,
+        isSmileLast: widget.shuffleListWithSmileLast);
+>>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
   }
 
   @override
@@ -68,7 +138,16 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     _timerToDetectFace?.cancel();
     _timerToDetectFace = null;
     _cameraController?.dispose();
+<<<<<<< HEAD
     // shuffleListLivenessChallenge(list: stepLiveness, isSmileLast: widget.shuffleListWithSmileLast, locale: widget.locale);
+=======
+    shuffleListLivenessChallenge(
+        list: widget.config.useCustomizedLabel &&
+                widget.config.customizedLabel != null
+            ? customizedLivenessLabel(widget.config.customizedLabel!)
+            : stepLiveness,
+        isSmileLast: widget.shuffleListWithSmileLast);
+>>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
     super.dispose();
   }
 
@@ -107,7 +186,13 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   }
 
   void _startFaceDetectionTimer() {
+<<<<<<< HEAD
     _timerToDetectFace = Timer(const Duration(seconds: 60), () => _onDetectionCompleted(imgToReturn: null));
+=======
+    _timerToDetectFace = Timer(
+        Duration(seconds: widget.config.durationLivenessVerify ?? 45),
+        () => _onDetectionCompleted(imgToReturn: null));
+>>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
   }
 
   Future<void> _processCameraImage(CameraImage cameraImage) async {
@@ -153,6 +238,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     if (inputImage.metadata?.size != null && inputImage.metadata?.rotation != null) {
       if (faces.isEmpty) {
         _resetSteps();
+<<<<<<< HEAD
         if (mounted) {
           setState(() => _faceDetectedState = false);
         }
@@ -160,12 +246,29 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
         if (mounted) {
           setState(() => _faceDetectedState = true);
         }
+=======
+        if (mounted) setState(() => _faceDetectedState = false);
+      } else {
+        if (mounted) setState(() => _faceDetectedState = true);
+>>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
         final currentIndex = _stepsKey.currentState?.currentIndex ?? 0;
-        if (currentIndex < stepLiveness.length) {
-          _detectFace(
-            face: faces.first,
-            step: stepLiveness[currentIndex].step,
-          );
+        if (widget.config.useCustomizedLabel) {
+          if (currentIndex <
+              customizedLivenessLabel(widget.config.customizedLabel!).length) {
+            _detectFace(
+              face: faces.first,
+              step: customizedLivenessLabel(
+                      widget.config.customizedLabel!)[currentIndex]
+                  .step,
+            );
+          }
+        } else {
+          if (currentIndex < stepLiveness.length) {
+            _detectFace(
+              face: faces.first,
+              step: stepLiveness[currentIndex].step,
+            );
+          }
         }
       }
     } else {
@@ -220,9 +323,14 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   void _takePicture() async {
     try {
       if (_cameraController == null || _isTakingPicture) return;
+<<<<<<< HEAD
       if (mounted) {
         setState(() => _isTakingPicture = true);
       }
+=======
+
+      if (mounted) setState(() => _isTakingPicture = true);
+>>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
       await _cameraController?.stopImageStream();
 
       final XFile? clickedImage = await _cameraController?.takePicture();
@@ -242,12 +350,17 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     if (widget.isEnableSnackBar) {
       final snackBar = SnackBar(
         content: Text(imgToReturn == null
+<<<<<<< HEAD
             ? widget.locale == "en"
                 ? 'Verification of liveness detection failed, please try again. (Exceeds time limit 60 second.)'
                 : "Verifikasi deteksi keaktifan gagal, silakan coba lagi. (Melebihi batas waktu 60 detik.)"
             : widget.locale == "en"
                 ? 'Verification of liveness detection success!'
                 : 'Verifikasi keberhasilan deteksi keaktifan!'),
+=======
+            ? 'Verification of liveness detection failed, please try again. (Exceeds time limit ${widget.config.durationLivenessVerify ?? 45} second.)'
+            : 'Verification of liveness detection success!'),
+>>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
@@ -255,24 +368,39 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   }
 
   void _resetSteps() {
-    for (var step in stepLiveness) {
-      final index = stepLiveness.indexWhere((p1) => p1.step == step.step);
-      stepLiveness[index] = stepLiveness[index].copyWith();
+    if (widget.config.useCustomizedLabel) {
+      for (var step
+          in customizedLivenessLabel(widget.config.customizedLabel!)) {
+        final index = customizedLivenessLabel(widget.config.customizedLabel!)
+            .indexWhere((p1) => p1.step == step.step);
+        customizedLivenessLabel(widget.config.customizedLabel!)[index] =
+            customizedLivenessLabel(widget.config.customizedLabel!)[index]
+                .copyWith();
+      }
+      if (_stepsKey.currentState?.currentIndex != 0) {
+        _stepsKey.currentState?.reset();
+      }
+      if (mounted) setState(() {});
+    } else {
+      for (var step in stepLiveness) {
+        final index = stepLiveness.indexWhere((p1) => p1.step == step.step);
+        stepLiveness[index] = stepLiveness[index].copyWith();
+      }
+      if (_stepsKey.currentState?.currentIndex != 0) {
+        _stepsKey.currentState?.reset();
+      }
+      if (mounted) setState(() {});
     }
-    if (_stepsKey.currentState?.currentIndex != 0) {
-      _stepsKey.currentState?.reset();
-    }
-    if (mounted) setState(() {});
   }
 
   void _startProcessing() {
     if (!mounted) return;
-    setState(() => _isProcessingStep = true);
+    if (mounted) setState(() => _isProcessingStep = true);
   }
 
   void _stopProcessing() {
     if (!mounted) return;
-    setState(() => _isProcessingStep = false);
+    if (mounted) setState(() => _isProcessingStep = false);
   }
 
   @override
@@ -289,7 +417,11 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
         _isInfoStepCompleted
             ? _buildDetectionBody()
             : LivenessDetectionTutorialScreen(
+<<<<<<< HEAD
                 locale: widget.locale,
+=======
+                duration: widget.config.durationLivenessVerify ?? 45,
+>>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
                 isDarkMode: widget.isDarkMode,
                 onStartTap: () {
                   if (mounted) setState(() => _isInfoStepCompleted = true);
@@ -312,12 +444,19 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
           color: widget.isDarkMode ? Colors.black : Colors.white,
         ),
         LivenessDetectionStepOverlayWidget(
+<<<<<<< HEAD
           locale: widget.locale,
+=======
+          duration: widget.config.durationLivenessVerify,
+          showDurationUiText: widget.config.showDurationUiText,
+>>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
           isDarkMode: widget.isDarkMode,
           isFaceDetected: _faceDetectedState,
           camera: CameraPreview(_cameraController!),
           key: _stepsKey,
-          steps: stepLiveness,
+          steps: widget.config.useCustomizedLabel
+              ? customizedLivenessLabel(widget.config.customizedLabel!)
+              : stepLiveness,
           showCurrentStep: widget.showCurrentStep,
           onCompleted: () => Future.delayed(
             const Duration(milliseconds: 500),
@@ -344,10 +483,33 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     required Face face,
     required LivenessDetectionStep step,
   }) async {
+<<<<<<< HEAD
     final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
     if ((face.headEulerAngleY ?? 0) < (headTurnThreshold?.rotationAngle ?? -30)) {
       _startProcessing();
       await _completeStep(step: step);
+=======
+    if (Platform.isAndroid) {
+      final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin
+              .instance.thresholdConfig
+              .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
+          as LivenessThresholdHead?;
+      if ((face.headEulerAngleY ?? 0) <
+          (headTurnThreshold?.rotationAngle ?? -30)) {
+        _startProcessing();
+        await _completeStep(step: step);
+      }
+    } else if (Platform.isIOS) {
+      final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin
+              .instance.thresholdConfig
+              .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
+          as LivenessThresholdHead?;
+      if ((face.headEulerAngleY ?? 0) >
+          (headTurnThreshold?.rotationAngle ?? 30)) {
+        _startProcessing();
+        await _completeStep(step: step);
+      }
+>>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
     }
   }
 
@@ -355,10 +517,33 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     required Face face,
     required LivenessDetectionStep step,
   }) async {
+<<<<<<< HEAD
     final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
     if ((face.headEulerAngleY ?? 0) > (headTurnThreshold?.rotationAngle ?? 30)) {
       _startProcessing();
       await _completeStep(step: step);
+=======
+    if (Platform.isAndroid) {
+      final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin
+              .instance.thresholdConfig
+              .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
+          as LivenessThresholdHead?;
+      if ((face.headEulerAngleY ?? 0) >
+          (headTurnThreshold?.rotationAngle ?? 30)) {
+        _startProcessing();
+        await _completeStep(step: step);
+      }
+    } else if (Platform.isIOS) {
+      final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin
+              .instance.thresholdConfig
+              .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
+          as LivenessThresholdHead?;
+      if ((face.headEulerAngleY ?? 0) <
+          (headTurnThreshold?.rotationAngle ?? -30)) {
+        _startProcessing();
+        await _completeStep(step: step);
+      }
+>>>>>>> 5cab1b465aa5ef1dafc4812b4fb096e3ff365c17
     }
   }
 

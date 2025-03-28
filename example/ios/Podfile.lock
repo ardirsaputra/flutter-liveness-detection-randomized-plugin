@@ -102,18 +102,18 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/integration_test/ios"
 
 SPEC CHECKSUMS:
-  camera_avfoundation: dd002b0330f4981e1bbcb46ae9b62829237459a4
+  camera_avfoundation: 04b44aeb14070126c6529e5ab82cc7c9fca107cf
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_liveness_detection_randomized_plugin: 637deb59a25a15242a5da981ca02a653981fabf8
-  google_mlkit_commons: 96aaca445520311b84a2da013dedf3427fe4cc69
-  google_mlkit_face_detection: b760d6035222630f347352b3b13f4a23ea9fb994
+  flutter_liveness_detection_randomized_plugin: d8961eea48ebce31e93c24ca6f7f87a14b66f732
+  google_mlkit_commons: 9f155ff61a70e0fad8692a7edb5aa2dc468536d3
+  google_mlkit_face_detection: 35c4b9a56db1acee146600be8d75c45b7a2fe6fc
   GoogleDataTransport: 6c09b596d841063d76d4288cc2d2f42cc36e1e2a
   GoogleMLKit: 97ac7af399057e99182ee8edfa8249e3226a4065
   GoogleToolboxForMac: d1a2cbf009c453f4d6ded37c105e2f67a32206d8
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   GoogleUtilitiesComponents: 679b2c881db3b615a2777504623df6122dd20afe
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
   MLImage: 1824212150da33ef225fbd3dc49f184cf611046c
   MLKitCommon: afec63980417d29ffbb4790529a1b0a2291699e1
   MLKitFaceDetection: 7c0e8bf09ddd27105da32d088fca978a99fc30cc

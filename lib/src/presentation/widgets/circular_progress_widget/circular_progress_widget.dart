@@ -65,6 +65,12 @@ class _CircularProgressWidgetState extends State<CircularProgressWidget> with Si
   }
 
   @override
+  void dispose() {
+    _animationController?.dispose();
+    super.dispose();
+  }
+
+  @override
   void didUpdateWidget(CircularProgressWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.current != widget.current) {
@@ -130,13 +136,6 @@ class _CircularProgressWidgetState extends State<CircularProgressWidget> with Si
       },
     );
   }
-
-  @override
-  void dispose() {
-    _animationController?.dispose(); // Melepaskan AnimationController
-    super.dispose();
-  }
-
   @override
   bool get wantKeepAlive => true;
 }

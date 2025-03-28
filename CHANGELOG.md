@@ -1,3 +1,10 @@
+## 1.0.4 🚀
+
+- ⚡ Improved performance during liveness challenge verification
+- 🎭 Customizable liveness challenge labels
+- ⏳ Flexible security verification duration
+- 🎲 Adjustable number of liveness challenges
+
 ## 1.0.3 🚀
 
 - 🛠️ Adjust to compatible camera dependency to prevent face not found

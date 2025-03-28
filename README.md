@@ -19,6 +19,9 @@ https://github.com/user-attachments/assets/f7266dc9-c4a2-4fba-8684-0ead2f678180
 - 🎨 Light and dark mode support
 - ✅ High accuracy liveness verification
 - 🚀 Simple integration API
+- 🎭 Customizable liveness challenge labels
+- ⏳ Flexible security verification duration
+- 🎲 Adjustable number of liveness challenges
 
 ## Getting Started 🌟
 
@@ -26,7 +29,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_liveness_detection_randomized_plugin: ^1.0.3
+  flutter_liveness_detection_randomized_plugin: ^1.0.4
 ```
 
 ## Platform Setup

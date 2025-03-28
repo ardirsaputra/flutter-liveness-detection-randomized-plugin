@@ -10,5 +10,7 @@
 	<array/>
 	<key>NSPrivacyTracking</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access is required for liveness detection</string>
 </dict>
 </plist>
