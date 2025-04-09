@@ -5,14 +5,14 @@ List<LivenessDetectionStepItem> stepLiveness = [
     step: LivenessDetectionStep.blink,
     title: "Blink 2-3 Times",
   ),
-  LivenessDetectionStepItem(
-    step: LivenessDetectionStep.lookUp,
-    title: "Look UP",
-  ),
-  LivenessDetectionStepItem(
-    step: LivenessDetectionStep.lookDown,
-    title: "Look DOWN",
-  ),
+  // LivenessDetectionStepItem(
+  //   step: LivenessDetectionStep.lookUp,
+  //   title: "Look UP",
+  // ),
+  // LivenessDetectionStepItem(
+  //   step: LivenessDetectionStep.lookDown,
+  //   title: "Look DOWN",
+  // ),
   LivenessDetectionStepItem(
     step: LivenessDetectionStep.lookRight,
     title: "Look RIGHT",

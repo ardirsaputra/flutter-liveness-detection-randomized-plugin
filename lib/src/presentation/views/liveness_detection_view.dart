@@ -104,12 +104,12 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     if (label.lookLeft?.isNotEmpty ?? false) {
       customizedSteps.add(LivenessDetectionStepItem(step: LivenessDetectionStep.lookLeft, title: label.lookLeft ?? "Look Left"));
     }
-    if (label.lookUp?.isNotEmpty ?? false) {
-      customizedSteps.add(LivenessDetectionStepItem(step: LivenessDetectionStep.lookUp, title: label.lookUp ?? "Look Up"));
-    }
-    if (label.lookDown?.isNotEmpty ?? false) {
-      customizedSteps.add(LivenessDetectionStepItem(step: LivenessDetectionStep.lookDown, title: label.lookDown ?? "Look Down"));
-    }
+    // if (label.lookUp?.isNotEmpty ?? false) {
+    //   customizedSteps.add(LivenessDetectionStepItem(step: LivenessDetectionStep.lookUp, title: label.lookUp ?? "Look Up"));
+    // }
+    // if (label.lookDown?.isNotEmpty ?? false) {
+    //   customizedSteps.add(LivenessDetectionStepItem(step: LivenessDetectionStep.lookDown, title: label.lookDown ?? "Look Down"));
+    // }
     if (label.smile?.isNotEmpty ?? false) {
       customizedSteps.add(LivenessDetectionStepItem(step: LivenessDetectionStep.smile, title: label.smile ?? "Smile"));
     }
@@ -231,12 +231,12 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
       case LivenessDetectionStep.lookLeft:
         await _handlingTurnLeft(face: face, step: step);
         break;
-      case LivenessDetectionStep.lookUp:
-        await _handlingLookUp(face: face, step: step);
-        break;
-      case LivenessDetectionStep.lookDown:
-        await _handlingLookDown(face: face, step: step);
-        break;
+      // case LivenessDetectionStep.lookUp:
+      //   await _handlingLookUp(face: face, step: step);
+      //   break;
+      // case LivenessDetectionStep.lookDown:
+      //   await _handlingLookDown(face: face, step: step);
+      //   break;
       case LivenessDetectionStep.smile:
         await _handlingSmile(face: face, step: step);
         break;
@@ -376,21 +376,21 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     }
   }
 
-  Future<void> _handlingLookUp({required Face face, required LivenessDetectionStep step}) async {
-    final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
-    if ((face.headEulerAngleX ?? 0) > (headTurnThreshold?.rotationAngle ?? 20)) {
-      _startProcessing();
-      await _completeStep(step: step);
-    }
-  }
+  // Future<void> _handlingLookUp({required Face face, required LivenessDetectionStep step}) async {
+  //   final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
+  //   if ((face.headEulerAngleX ?? 0) > (headTurnThreshold?.rotationAngle ?? 20)) {
+  //     _startProcessing();
+  //     await _completeStep(step: step);
+  //   }
+  // }
 
-  Future<void> _handlingLookDown({required Face face, required LivenessDetectionStep step}) async {
-    final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
-    if ((face.headEulerAngleX ?? 0) < (headTurnThreshold?.rotationAngle ?? -15)) {
-      _startProcessing();
-      await _completeStep(step: step);
-    }
-  }
+  // Future<void> _handlingLookDown({required Face face, required LivenessDetectionStep step}) async {
+  //   final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
+  //   if ((face.headEulerAngleX ?? 0) < (headTurnThreshold?.rotationAngle ?? -15)) {
+  //     _startProcessing();
+  //     await _completeStep(step: step);
+  //   }
+  // }
 
   Future<void> _handlingSmile({required Face face, required LivenessDetectionStep step}) async {
     final smileThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdSmile) as LivenessThresholdSmile?;
