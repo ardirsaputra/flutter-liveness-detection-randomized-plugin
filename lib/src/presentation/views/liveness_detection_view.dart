@@ -129,19 +129,19 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
         ));
       }
 
-      if (label.lookUp != "" && widget.config.useCustomizedLabel) {
-        customizedSteps.add(LivenessDetectionStepItem(
-          step: LivenessDetectionStep.lookUp,
-          title: label.lookUp ?? "Look Up",
-        ));
-      }
+      // if (label.lookUp != "" && widget.config.useCustomizedLabel) {
+      //   customizedSteps.add(LivenessDetectionStepItem(
+      //     step: LivenessDetectionStep.lookUp,
+      //     title: label.lookUp ?? "Look Up",
+      //   ));
+      // }
 
-      if (label.lookDown != "" && widget.config.useCustomizedLabel) {
-        customizedSteps.add(LivenessDetectionStepItem(
-          step: LivenessDetectionStep.lookDown,
-          title: label.lookDown ?? "Look Down",
-        ));
-      }
+      // if (label.lookDown != "" && widget.config.useCustomizedLabel) {
+      //   customizedSteps.add(LivenessDetectionStepItem(
+      //     step: LivenessDetectionStep.lookDown,
+      //     title: label.lookDown ?? "Look Down",
+      //   ));
+      // }
 
       if (label.smile != "" && widget.config.useCustomizedLabel) {
         customizedSteps.add(LivenessDetectionStepItem(
@@ -343,13 +343,13 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
         await _handlingTurnLeft(face: face, step: step);
         break;
 
-      case LivenessDetectionStep.lookUp:
-        await _handlingLookUp(face: face, step: step);
-        break;
+      // case LivenessDetectionStep.lookUp:
+      //   await _handlingLookUp(face: face, step: step);
+      //   break;
 
-      case LivenessDetectionStep.lookDown:
-        await _handlingLookDown(face: face, step: step);
-        break;
+      // case LivenessDetectionStep.lookDown:
+      //   await _handlingLookDown(face: face, step: step);
+      //   break;
 
       case LivenessDetectionStep.smile:
         await _handlingSmile(face: face, step: step);
@@ -387,8 +387,9 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     if (widget.isEnableSnackBar) {
       final snackBar = SnackBar(
         content: Text(imgToReturn == null
-            ? 'Verification of liveness detection failed, please try again. (Exceeds time limit ${widget.config.durationLivenessVerify ?? 45} second.)'
-            : 'Verification of liveness detection success!'),
+        // translate ke indonesia
+            ? 'Verifikasi deteksi liveness gagal, silahkan coba lagi. (Melebihi batas waktu ${widget.config.durationLivenessVerify ?? 45} detik.)'
+            : 'Verifikasi deteksi liveness berhasil!'),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
@@ -565,35 +566,35 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     }
   }
 
-  Future<void> _handlingLookUp({
-    required Face face,
-    required LivenessDetectionStep step,
-  }) async {
-    final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin
-            .instance.thresholdConfig
-            .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
-        as LivenessThresholdHead?;
-    if ((face.headEulerAngleX ?? 0) >
-        (headTurnThreshold?.rotationAngle ?? 20)) {
-      _startProcessing();
-      await _completeStep(step: step);
-    }
-  }
+  // Future<void> _handlingLookUp({
+  //   required Face face,
+  //   required LivenessDetectionStep step,
+  // }) async {
+  //   final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin
+  //           .instance.thresholdConfig
+  //           .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
+  //       as LivenessThresholdHead?;
+  //   if ((face.headEulerAngleX ?? 0) >
+  //       (headTurnThreshold?.rotationAngle ?? 20)) {
+  //     _startProcessing();
+  //     await _completeStep(step: step);
+  //   }
+  // }
 
-  Future<void> _handlingLookDown({
-    required Face face,
-    required LivenessDetectionStep step,
-  }) async {
-    final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin
-            .instance.thresholdConfig
-            .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
-        as LivenessThresholdHead?;
-    if ((face.headEulerAngleX ?? 0) <
-        (headTurnThreshold?.rotationAngle ?? -15)) {
-      _startProcessing();
-      await _completeStep(step: step);
-    }
-  }
+  // Future<void> _handlingLookDown({
+  //   required Face face,
+  //   required LivenessDetectionStep step,
+  // }) async {
+  //   final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin
+  //           .instance.thresholdConfig
+  //           .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
+  //       as LivenessThresholdHead?;
+  //   if ((face.headEulerAngleX ?? 0) <
+  //       (headTurnThreshold?.rotationAngle ?? -15)) {
+  //     _startProcessing();
+  //     await _completeStep(step: step);
+  //   }
+  // }
 
   Future<void> _handlingSmile({
     required Face face,

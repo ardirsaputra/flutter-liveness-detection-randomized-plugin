@@ -2,7 +2,7 @@ enum LivenessDetectionStep {
   blink,
   lookRight,
   lookLeft,
-  lookUp,
-  lookDown,
+  // lookUp,
+  // lookDown,
   smile
 }
