@@ -127,6 +127,23 @@ class _LivenessDetectionTutorialScreenState extends State<LivenessDetectionTutor
               height: 10,
             ),
             const Spacer(),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.grey,
+                  size: 15,
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Text(
+                  'Package Version: 1.0.6',
+                  style: TextStyle(color: Colors.grey),
+                )
+              ],
+            )
           ],
         ),
       ),
