@@ -139,7 +139,7 @@ class _LivenessDetectionTutorialScreenState extends State<LivenessDetectionTutor
                   width: 10,
                 ),
                 Text(
-                  'Package Version: 1.0.6',
+                  'Package Version: 1.0.7',
                   style: TextStyle(color: Colors.grey),
                 )
               ],
