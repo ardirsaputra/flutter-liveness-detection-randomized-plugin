@@ -133,26 +133,26 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     if (!_isShuffled) {
       List<LivenessDetectionStepItem> customizedSteps = [];
 
-      // if (label.blink != "" && widget.config.useCustomizedLabel) {
+      if (label.blink != "" && widget.config.useCustomizedLabel) {
+        customizedSteps.add(LivenessDetectionStepItem(
+          step: LivenessDetectionStep.blink,
+          title: label.blink ?? "Blink 2-3 Times",
+        ));
+      }
+
+      // if (label.lookRight != "" && widget.config.useCustomizedLabel) {
       //   customizedSteps.add(LivenessDetectionStepItem(
-      //     step: LivenessDetectionStep.blink,
-      //     title: label.blink ?? "Blink 2-3 Times",
+      //     step: LivenessDetectionStep.lookRight,
+      //     title: label.lookRight ?? "Look Right",
       //   ));
       // }
 
-      if (label.lookRight != "" && widget.config.useCustomizedLabel) {
-        customizedSteps.add(LivenessDetectionStepItem(
-          step: LivenessDetectionStep.lookRight,
-          title: label.lookRight ?? "Look Right",
-        ));
-      }
-
-      if (label.lookLeft != "" && widget.config.useCustomizedLabel) {
-        customizedSteps.add(LivenessDetectionStepItem(
-          step: LivenessDetectionStep.lookLeft,
-          title: label.lookLeft ?? "Look Left",
-        ));
-      }
+      // if (label.lookLeft != "" && widget.config.useCustomizedLabel) {
+      //   customizedSteps.add(LivenessDetectionStepItem(
+      //     step: LivenessDetectionStep.lookLeft,
+      //     title: label.lookLeft ?? "Look Left",
+      //   ));
+      // }
 
       // if (label.lookUp != "" && widget.config.useCustomizedLabel) {
       //   customizedSteps.add(LivenessDetectionStepItem(
@@ -328,17 +328,17 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     debugPrint('Current Step: $step');
 
     switch (step) {
-      // case LivenessDetectionStep.blink:
-      //   await _handlingBlinkStep(face: face, step: step);
+      case LivenessDetectionStep.blink:
+        await _handlingBlinkStep(face: face, step: step);
+        break;
+
+      // case LivenessDetectionStep.lookRight:
+      //   await _handlingTurnRight(face: face, step: step);
       //   break;
 
-      case LivenessDetectionStep.lookRight:
-        await _handlingTurnRight(face: face, step: step);
-        break;
-
-      case LivenessDetectionStep.lookLeft:
-        await _handlingTurnLeft(face: face, step: step);
-        break;
+      // case LivenessDetectionStep.lookLeft:
+      //   await _handlingTurnLeft(face: face, step: step);
+      //   break;
 
       // case LivenessDetectionStep.lookUp:
       //   await _handlingLookUp(face: face, step: step);
@@ -493,61 +493,55 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     );
   }
 
-  // Future<void> _handlingBlinkStep({
+  Future<void> _handlingBlinkStep({
+    required Face face,
+    required LivenessDetectionStep step,
+  }) async {
+    final blinkThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdBlink) as LivenessThresholdBlink?;
+
+    if ((face.leftEyeOpenProbability ?? 1.0) < (blinkThreshold?.leftEyeProbability ?? 0.25) && (face.rightEyeOpenProbability ?? 1.0) < (blinkThreshold?.rightEyeProbability ?? 0.25)) {
+      _startProcessing();
+      await _completeStep(step: step);
+    }
+  }
+
+  // Future<void> _handlingTurnRight({
   //   required Face face,
   //   required LivenessDetectionStep step,
   // }) async {
-  //   final blinkThreshold = FlutterLivenessDetectionRandomizedPlugin
-  //           .instance.thresholdConfig
-  //           .firstWhereOrNull((p0) => p0 is LivenessThresholdBlink)
-  //       as LivenessThresholdBlink?;
-
-  //   if ((face.leftEyeOpenProbability ?? 1.0) <
-  //           (blinkThreshold?.leftEyeProbability ?? 0.25) &&
-  //       (face.rightEyeOpenProbability ?? 1.0) <
-  //           (blinkThreshold?.rightEyeProbability ?? 0.25)) {
-  //     _startProcessing();
-  //     await _completeStep(step: step);
+  //   if (Platform.isAndroid) {
+  //     final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
+  //     if ((face.headEulerAngleY ?? 0) < (headTurnThreshold?.rotationAngle ?? -30)) {
+  //       _startProcessing();
+  //       await _completeStep(step: step);
+  //     }
+  //   } else if (Platform.isIOS) {
+  //     final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
+  //     if ((face.headEulerAngleY ?? 0) > (headTurnThreshold?.rotationAngle ?? 30)) {
+  //       _startProcessing();
+  //       await _completeStep(step: step);
+  //     }
   //   }
   // }
 
-  Future<void> _handlingTurnRight({
-    required Face face,
-    required LivenessDetectionStep step,
-  }) async {
-    if (Platform.isAndroid) {
-      final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
-      if ((face.headEulerAngleY ?? 0) < (headTurnThreshold?.rotationAngle ?? -30)) {
-        _startProcessing();
-        await _completeStep(step: step);
-      }
-    } else if (Platform.isIOS) {
-      final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
-      if ((face.headEulerAngleY ?? 0) > (headTurnThreshold?.rotationAngle ?? 30)) {
-        _startProcessing();
-        await _completeStep(step: step);
-      }
-    }
-  }
-
-  Future<void> _handlingTurnLeft({
-    required Face face,
-    required LivenessDetectionStep step,
-  }) async {
-    if (Platform.isAndroid) {
-      final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
-      if ((face.headEulerAngleY ?? 0) > (headTurnThreshold?.rotationAngle ?? 30)) {
-        _startProcessing();
-        await _completeStep(step: step);
-      }
-    } else if (Platform.isIOS) {
-      final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
-      if ((face.headEulerAngleY ?? 0) < (headTurnThreshold?.rotationAngle ?? -30)) {
-        _startProcessing();
-        await _completeStep(step: step);
-      }
-    }
-  }
+  // Future<void> _handlingTurnLeft({
+  //   required Face face,
+  //   required LivenessDetectionStep step,
+  // }) async {
+  //   if (Platform.isAndroid) {
+  //     final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
+  //     if ((face.headEulerAngleY ?? 0) > (headTurnThreshold?.rotationAngle ?? 30)) {
+  //       _startProcessing();
+  //       await _completeStep(step: step);
+  //     }
+  //   } else if (Platform.isIOS) {
+  //     final headTurnThreshold = FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig.firstWhereOrNull((p0) => p0 is LivenessThresholdHead) as LivenessThresholdHead?;
+  //     if ((face.headEulerAngleY ?? 0) < (headTurnThreshold?.rotationAngle ?? -30)) {
+  //       _startProcessing();
+  //       await _completeStep(step: step);
+  //     }
+  //   }
+  // }
 
   // Future<void> _handlingLookUp({
   //   required Face face,
